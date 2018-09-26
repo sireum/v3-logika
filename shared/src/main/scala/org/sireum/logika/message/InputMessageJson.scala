@@ -70,9 +70,9 @@ object InputMessageJson {
       case o: Js.Obj =>
         (o.value.head._2.asInstanceOf[Js.Str].value match {
            case "Check" =>
-             org.sireum.logika.message.Check(toStr(o.value(1)._2), toBoolean(o.value(2)._2), toStr(o.value(3)._2), toBoolean(o.value(4)._2), toBoolean(o.value(5)._2), toBoolean(o.value(6)._2), toVector(o.value(7)._2)(toInputMessage[ProofFile]), toBoolean(o.value(8)._2), toBoolean(o.value(9)._2), toInt(o.value(10)._2), toBoolean(o.value(11)._2), toInt(o.value(12)._2), toInt(o.value(13)._2), toInt(o.value(14)._2), toBoolean(o.value(15)._2))
+             org.sireum.logika.message.Check(toStr(o.value.toList(1)._2), toBoolean(o.value.toList(2)._2), toStr(o.value.toList(3)._2), toBoolean(o.value.toList(4)._2), toBoolean(o.value.toList(5)._2), toBoolean(o.value.toList(6)._2), toVector(o.value.toList(7)._2)(toInputMessage[ProofFile]), toBoolean(o.value.toList(8)._2), toBoolean(o.value.toList(9)._2), toInt(o.value.toList(10)._2), toBoolean(o.value.toList(11)._2), toInt(o.value.toList(12)._2), toInt(o.value.toList(13)._2), toInt(o.value.toList(14)._2), toBoolean(o.value.toList(15)._2))
            case "ProofFile" =>
-             org.sireum.logika.message.ProofFile(toOption(o.value(1)._2)(toStr), toStr(o.value(2)._2))
+             org.sireum.logika.message.ProofFile(toOption(o.value.toList(1)._2)(toStr), toStr(o.value.toList(2)._2))
            case "Terminate" => org.sireum.logika.message.Terminate
          }).asInstanceOf[T]
     }

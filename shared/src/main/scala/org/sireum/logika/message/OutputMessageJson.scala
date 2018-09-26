@@ -52,7 +52,7 @@ object OutputMessageJson {
       case o: Js.Obj =>
         (o.value.head._2.asInstanceOf[Js.Str].value match {
            case "Result" =>
-             org.sireum.logika.message.Result(toStr(o.value(1)._2), toBoolean(o.value(2)._2), toVector(o.value(3)._2)(toTag[Tag]))
+             org.sireum.logika.message.Result(toStr(o.value.toList(1)._2), toBoolean(o.value.toList(2)._2), toVector(o.value.toList(3)._2)(toTag[Tag]))
          }).asInstanceOf[T]
     }
 }
