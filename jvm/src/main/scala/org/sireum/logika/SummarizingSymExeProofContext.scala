@@ -66,7 +66,9 @@ SummarizingSymExeProofContext(unitNode: ast.Program,
     }
     (pcOpt, block.returnOpt) match {
       case (Some(pc), Some(ret)) =>
-        pc.checkPostCondition(nodeLocMap(ret), ret.expOpt)
+        if (!pc.hasRuntimeError(ret)) {
+          pc.checkPostCondition(nodeLocMap(ret), ret.expOpt)
+        }
         pcOpt = None
       case (Some(pc), _) if checkReturn =>
         val li = nodeLocMap(block)

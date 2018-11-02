@@ -64,7 +64,7 @@ SymExeProofContext[T <: SymExeProofContext[T]](implicit reporter: AccumulatingTa
     }
   }
 
-  final def hasRuntimeError(stmt: ast.Stmt): Boolean = {
+  final def hasRuntimeError(stmt: ast.Node): Boolean = {
     import ast.Exp
     def zERange(e: Exp, t: tipe.Tipe, lo: Exp, hi: Exp) =
       Exp.And(tipe.B, Exp.Le(t, lo, e), Exp.Le(t, e, hi))
