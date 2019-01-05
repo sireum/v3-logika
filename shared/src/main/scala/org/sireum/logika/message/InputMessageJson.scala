@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017, Robby, Kansas State University
+Copyright (c) 2019, Robby, Kansas State University
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -70,9 +70,9 @@ object InputMessageJson {
       case o: Js.Obj =>
         (o.value.head._2.asInstanceOf[Js.Str].value match {
            case "Check" =>
-             org.sireum.logika.message.Check(toStr(o.value.toList(1)._2), toBoolean(o.value.toList(2)._2), toStr(o.value.toList(3)._2), toBoolean(o.value.toList(4)._2), toBoolean(o.value.toList(5)._2), toBoolean(o.value.toList(6)._2), toVector(o.value.toList(7)._2)(toInputMessage[ProofFile]), toBoolean(o.value.toList(8)._2), toBoolean(o.value.toList(9)._2), toInt(o.value.toList(10)._2), toBoolean(o.value.toList(11)._2), toInt(o.value.toList(12)._2), toInt(o.value.toList(13)._2), toInt(o.value.toList(14)._2), toBoolean(o.value.toList(15)._2))
+             org.sireum.logika.message.Check(toStr(o.value.toSeq(1)._2), toBoolean(o.value.toSeq(2)._2), toStr(o.value.toSeq(3)._2), toBoolean(o.value.toSeq(4)._2), toBoolean(o.value.toSeq(5)._2), toBoolean(o.value.toSeq(6)._2), toVector(o.value.toSeq(7)._2)(toInputMessage[ProofFile]), toBoolean(o.value.toSeq(8)._2), toBoolean(o.value.toSeq(9)._2), toInt(o.value.toSeq(10)._2), toBoolean(o.value.toSeq(11)._2), toInt(o.value.toSeq(12)._2), toInt(o.value.toSeq(13)._2), toInt(o.value.toSeq(14)._2), toBoolean(o.value.toSeq(15)._2))
            case "ProofFile" =>
-             org.sireum.logika.message.ProofFile(toOption(o.value.toList(1)._2)(toStr), toStr(o.value.toList(2)._2))
+             org.sireum.logika.message.ProofFile(toOption(o.value.toSeq(1)._2)(toStr), toStr(o.value.toSeq(2)._2))
            case "Terminate" => org.sireum.logika.message.Terminate
          }).asInstanceOf[T]
     }

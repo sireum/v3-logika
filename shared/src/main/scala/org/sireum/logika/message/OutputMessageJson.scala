@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017, Robby, Kansas State University
+Copyright (c) 2019, Robby, Kansas State University
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,7 @@ object OutputMessageJson {
       case o: Js.Obj =>
         (o.value.head._2.asInstanceOf[Js.Str].value match {
            case "Result" =>
-             org.sireum.logika.message.Result(toStr(o.value.toList(1)._2), toBoolean(o.value.toList(2)._2), toVector(o.value.toList(3)._2)(toTag[Tag]))
+             org.sireum.logika.message.Result(toStr(o.value.toSeq(1)._2), toBoolean(o.value.toSeq(2)._2), toVector(o.value.toSeq(3)._2)(toTag[Tag]))
          }).asInstanceOf[T]
     }
 }
