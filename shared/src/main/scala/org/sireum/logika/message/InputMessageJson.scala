@@ -28,17 +28,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.sireum.logika.message
 
-import upickle.Js
 import org.sireum.util.Json._
 
 object InputMessageJson {
   import scala.language.implicitConversions
 
-  implicit def fromInputMessage(o: org.sireum.logika.message.InputMessage): Js.Obj =
+  implicit def fromInputMessage(o: org.sireum.logika.message.InputMessage): ujson.Obj =
     o match {
       case o: org.sireum.logika.message.Check =>
-        Js.Obj(
-          (".class", Js.Str("Check")),
+        ujson.Obj(
+          (".class", ujson.Str("Check")),
           ("requestId", fromStr(o.requestId)),
           ("isBackground", fromAnyVal(o.isBackground)),
           ("kind", fromStr(o.kind)),
@@ -56,19 +55,19 @@ object InputMessageJson {
           ("useMethodContract", fromAnyVal(o.useMethodContract))
         )
       case o: org.sireum.logika.message.ProofFile =>
-        Js.Obj(
-          (".class", Js.Str("ProofFile")),
+        ujson.Obj(
+          (".class", ujson.Str("ProofFile")),
           ("fileUriOpt", fromOption(o.fileUriOpt)(fromStr)),
           ("content", fromStr(o.content))
         )
       case org.sireum.logika.message.Terminate =>
-        Js.Obj((".class", Js.Str("Terminate")))
+        ujson.Obj((".class", ujson.Str("Terminate")))
     }
 
-  implicit def toInputMessage[T <: org.sireum.logika.message.InputMessage](v: Js.Value): T =
+  implicit def toInputMessage[T <: org.sireum.logika.message.InputMessage](v: ujson.Value): T =
     (v: @unchecked) match {
-      case o: Js.Obj =>
-        (o.value.head._2.asInstanceOf[Js.Str].value match {
+      case o: ujson.Obj =>
+        (o.value.head._2.asInstanceOf[ujson.Str].value match {
            case "Check" =>
              org.sireum.logika.message.Check(toStr(o.value.toSeq(1)._2), toBoolean(o.value.toSeq(2)._2), toStr(o.value.toSeq(3)._2), toBoolean(o.value.toSeq(4)._2), toBoolean(o.value.toSeq(5)._2), toBoolean(o.value.toSeq(6)._2), toVector(o.value.toSeq(7)._2)(toInputMessage[ProofFile]), toBoolean(o.value.toSeq(8)._2), toBoolean(o.value.toSeq(9)._2), toInt(o.value.toSeq(10)._2), toBoolean(o.value.toSeq(11)._2), toInt(o.value.toSeq(12)._2), toInt(o.value.toSeq(13)._2), toInt(o.value.toSeq(14)._2), toBoolean(o.value.toSeq(15)._2))
            case "ProofFile" =>

@@ -28,7 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.sireum.logika.message
 
-import upickle.Js
 import org.sireum.util.Json._
 import org.sireum.util._
 import org.sireum.util.TagJson._
@@ -36,21 +35,21 @@ import org.sireum.util.TagJson._
 object OutputMessageJson {
   import scala.language.implicitConversions
 
-  implicit def fromOutputMessage(o: org.sireum.logika.message.OutputMessage): Js.Obj =
+  implicit def fromOutputMessage(o: org.sireum.logika.message.OutputMessage): ujson.Obj =
     o match {
       case o: org.sireum.logika.message.Result =>
-        Js.Obj(
-          (".class", Js.Str("Result")),
+        ujson.Obj(
+          (".class", ujson.Str("Result")),
           ("requestId", fromStr(o.requestId)),
           ("isBackground", fromAnyVal(o.isBackground)),
           ("tags", fromSeq(o.tags)(fromTag))
         )
     }
 
-  implicit def toOutputMessage[T <: org.sireum.logika.message.OutputMessage](v: Js.Value): T =
+  implicit def toOutputMessage[T <: org.sireum.logika.message.OutputMessage](v: ujson.Value): T =
     (v: @unchecked) match {
-      case o: Js.Obj =>
-        (o.value.head._2.asInstanceOf[Js.Str].value match {
+      case o: ujson.Obj =>
+        (o.value.head._2.asInstanceOf[ujson.Str].value match {
            case "Result" =>
              org.sireum.logika.message.Result(toStr(o.value.toSeq(1)._2), toBoolean(o.value.toSeq(2)._2), toVector(o.value.toSeq(3)._2)(toTag[Tag]))
          }).asInstanceOf[T]

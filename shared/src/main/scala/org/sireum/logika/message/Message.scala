@@ -29,16 +29,16 @@ import org.sireum.util._
 
 object Message {
   def pickleInput(m: InputMessage): String =
-    upickle.json.write(InputMessageJson.fromInputMessage(m))
+    ujson.write(InputMessageJson.fromInputMessage(m))
 
   def unpickleInput[T <: InputMessage](s: String): T =
-    InputMessageJson.toInputMessage[T](upickle.json.read(s))
+    InputMessageJson.toInputMessage[T](ujson.read(s))
 
   def pickleOutput(m: OutputMessage): String =
-    upickle.json.write(OutputMessageJson.fromOutputMessage(m))
+    ujson.write(OutputMessageJson.fromOutputMessage(m))
 
   def unpickleOutput[T <: OutputMessage](s: String): T =
-    OutputMessageJson.toOutputMessage[T](upickle.json.read(s))
+    OutputMessageJson.toOutputMessage[T](ujson.read(s))
 }
 
 sealed trait InputMessage extends Product
