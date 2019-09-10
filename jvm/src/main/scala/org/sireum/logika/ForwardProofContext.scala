@@ -141,7 +141,7 @@ ForwardProofContext(unitNode: ast.Program,
     var hasError = false
     lazy val ps = premises ++ facts.values
 
-    def divisor(e: ast.Exp, t: tipe.IntegralTipe): Boolean = {
+    def divisor(e: ast.Exp, t: tipe.IntegralTipe, isPos: Boolean): Boolean = {
       val tpe = t match {
         case tipe.Z => ast.ZType()
         case tipe.Z8 => ast.Z8Type()
@@ -163,15 +163,55 @@ ForwardProofContext(unitNode: ast.Program,
         case tipe.U64 => ast.U64Type()
       }
       val req =
-        if (t == tipe.Z) ast.Exp.Ne(t, e, Checker.zero)
-        else ast.Exp.Ne(t, e, ast.IntLit("0", tpe.bitWidth, Some(tpe)))
+        if (isPos)
+          if (t == tipe.Z) ast.Exp.Gt(t, e, Checker.zero)
+          else ast.Exp.Gt(t, e, ast.IntLit("0", tpe.bitWidth, Some(tpe)))
+        else
+          if (t == tipe.Z) ast.Exp.Ne(t, e, Checker.zero)
+          else ast.Exp.Ne(t, e, ast.IntLit("0", tpe.bitWidth, Some(tpe)))
       if (autoEnabled) {
         if (!isValid("division", nodeLocMap(e), ps, ivector(req))) {
-          error(e, s"Could not automatically deduce that the divisor is non-zero.")
+          error(e, s"Could not automatically deduce that the denominator is ${if (isPos) "positive" else "non-zero"}.")
           hasError = true
         }
       } else if (!premises.contains(req)) {
-        error(e, s"Divisor has to be proven to be non-zero.")
+        error(e, s"Denominator has to be proven to be ${if (isPos) "positive" else "non-zero"}.")
+        hasError = true
+      }
+      true
+    }
+
+    def rem(e: ast.Exp, t: tipe.IntegralTipe): Boolean = {
+      val tpe = t match {
+        case tipe.Z => ast.ZType()
+        case tipe.Z8 => ast.Z8Type()
+        case tipe.Z16 => ast.Z16Type()
+        case tipe.Z32 => ast.Z32Type()
+        case tipe.Z64 => ast.Z64Type()
+        case tipe.N => ast.NType()
+        case tipe.N8 => ast.N8Type()
+        case tipe.N16 => ast.N16Type()
+        case tipe.N32 => ast.N32Type()
+        case tipe.N64 => ast.N64Type()
+        case tipe.S8 => ast.S8Type()
+        case tipe.S16 => ast.S16Type()
+        case tipe.S32 => ast.S32Type()
+        case tipe.S64 => ast.S64Type()
+        case tipe.U8 => ast.U8Type()
+        case tipe.U16 => ast.U16Type()
+        case tipe.U32 => ast.U32Type()
+        case tipe.U64 => ast.U64Type()
+      }
+      val req =
+        if (t == tipe.Z) ast.Exp.Ge(t, e, Checker.zero)
+        else ast.Exp.Ge(t, e, ast.IntLit("0", tpe.bitWidth, Some(tpe)))
+      if (autoEnabled) {
+        if (!isValid("remainder", nodeLocMap(e), ps, ivector(req))) {
+          error(e, s"Could not automatically deduce that the numerator is non-negative.")
+          hasError = true
+        }
+      } else if (!premises.contains(req)) {
+        error(e, s"Numerator has to be proven to be non-negative.")
         hasError = true
       }
       true
@@ -209,8 +249,10 @@ ForwardProofContext(unitNode: ast.Program,
     Visitor.build({
       case _: ast.Block => false
       case _: ast.LoopInv => false
-      case e@ast.Div(_, e2) => divisor(e2, e.tipe.asInstanceOf[tipe.IntegralTipe])
-      case e@ast.Rem(_, e2) => divisor(e2, e.tipe.asInstanceOf[tipe.IntegralTipe])
+      case e@ast.Div(_, e2) => divisor(e2, e.tipe.asInstanceOf[tipe.IntegralTipe], isPos = false)
+      case e@ast.Rem(e1, e2) =>
+        rem(e1, e.tipe.asInstanceOf[tipe.IntegralTipe])
+        divisor(e2, e.tipe.asInstanceOf[tipe.IntegralTipe], isPos = true)
       case a@ast.Apply(exp, Seq(arg)) if a.expTipe.isInstanceOf[tipe.MSeq] => index(exp, a.expTipe, arg)
       case a: ast.Apply => checkInvoke(a)
       case ast.SeqAssign(id, e, _) => index(id, id.tipe, e)

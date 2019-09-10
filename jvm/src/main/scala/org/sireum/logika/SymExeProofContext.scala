@@ -152,7 +152,7 @@ SymExeProofContext[T <: SymExeProofContext[T]](implicit reporter: AccumulatingTa
       r
     }
     var hasError = false
-    def divisor(e: Exp, t: tipe.IntegralTipe): Boolean = {
+    def divisor(e: Exp, t: tipe.IntegralTipe, isPos: Boolean): Boolean = {
       val tpe = t match {
         case tipe.Z => ast.ZType()
         case tipe.Z8 => ast.Z8Type()
@@ -173,9 +173,39 @@ SymExeProofContext[T <: SymExeProofContext[T]](implicit reporter: AccumulatingTa
         case tipe.U32 => ast.U32Type()
         case tipe.U64 => ast.U64Type()
       }
-      val req = Exp.Ne(t, e, ast.IntLit("0", tpe.bitWidth, Some(tpe)))
+      val req =
+        if (isPos) Exp.Gt(t, e, ast.IntLit("0", tpe.bitWidth, Some(tpe)))
+        else Exp.Ne(t, e, ast.IntLit("0", tpe.bitWidth, Some(tpe)))
       if (!isValid("division", nodeLocMap(e), ps, ivector(req))) {
-        error(e, s"Could not automatically deduce that the divisor is non-zero.")
+        error(e, s"Could not automatically deduce that the denominator is ${if (isPos) "positive" else "non-zero"}.")
+        hasError = true
+      }
+      true
+    }
+    def rem(e: Exp, t: tipe.IntegralTipe): Boolean = {
+      val tpe = t match {
+        case tipe.Z => ast.ZType()
+        case tipe.Z8 => ast.Z8Type()
+        case tipe.Z16 => ast.Z16Type()
+        case tipe.Z32 => ast.Z32Type()
+        case tipe.Z64 => ast.Z64Type()
+        case tipe.N => ast.NType()
+        case tipe.N8 => ast.N8Type()
+        case tipe.N16 => ast.N16Type()
+        case tipe.N32 => ast.N32Type()
+        case tipe.N64 => ast.N64Type()
+        case tipe.S8 => ast.S8Type()
+        case tipe.S16 => ast.S16Type()
+        case tipe.S32 => ast.S32Type()
+        case tipe.S64 => ast.S64Type()
+        case tipe.U8 => ast.U8Type()
+        case tipe.U16 => ast.U16Type()
+        case tipe.U32 => ast.U32Type()
+        case tipe.U64 => ast.U64Type()
+      }
+      val req = Exp.Ge(t, e, ast.IntLit("0", tpe.bitWidth, Some(tpe)))
+      if (!isValid("remainder", nodeLocMap(e), ps, ivector(req))) {
+        error(e, s"Could not automatically deduce that the numerator is non-negative.")
         hasError = true
       }
       true
@@ -250,8 +280,12 @@ SymExeProofContext[T <: SymExeProofContext[T]](implicit reporter: AccumulatingTa
       case e: ast.Add => rangeCheckTipe(e, e.tipe); true
       case e: ast.Sub => rangeCheckTipe(e, e.tipe); true
       case e: ast.Mul => rangeCheckTipe(e, e.tipe); true
-      case e: ast.Div => rangeCheckTipe(e, e.tipe); divisor(e.right, e.tipe.asInstanceOf[tipe.IntegralTipe]); true
-      case e: ast.Rem => rangeCheckTipe(e, e.tipe); divisor(e.right, e.tipe.asInstanceOf[tipe.IntegralTipe]); true
+      case e: ast.Div => rangeCheckTipe(e, e.tipe); divisor(e.right, e.tipe.asInstanceOf[tipe.IntegralTipe], isPos = false); true
+      case e: ast.Rem =>
+        rangeCheckTipe(e, e.tipe)
+        rem(e.left, e.tipe.asInstanceOf[tipe.IntegralTipe])
+        divisor(e.right, e.tipe.asInstanceOf[tipe.IntegralTipe], isPos = true)
+        true
       case e: ast.Minus => rangeCheckTipe(e, e.tipe); true
       case e: ast.Shl => nonNegativeCheck(e.right, e.tipe); true
       case e: ast.Shr => nonNegativeCheck(e.right, e.tipe); true
