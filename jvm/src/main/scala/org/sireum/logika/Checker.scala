@@ -646,7 +646,7 @@ ProofContext[T <: ProofContext[T]](implicit reporter: AccumulatingTagReporter) {
         // if proofGroup is a SubProof
         case p: ast.SubProof =>
           // consider the type of the first step in the subproof (the assume step)
-          val popt = p.assumeStep match {
+          p.assumeStep match {
             case step: ast.PlainAssumeStep =>
               addedSteps += p.assumeStep.num.value
               addPremise(addProvedStep(p.assumeStep), step.exp)
@@ -658,7 +658,6 @@ ProofContext[T <: ProofContext[T]](implicit reporter: AccumulatingTagReporter) {
               addedSteps += p.assumeStep.num.value
               addPremise(addVar(id, num.value).flatMap(_.addProvedStep(p.assumeStep)), exp)
           }
-          popt.flatMap(_.addProvedStep(p))
         case _ => Some(this.asInstanceOf[T])
       }
     for (step <- proofGroup.steps if pcOpt.isDefined) {
@@ -669,10 +668,14 @@ ProofContext[T <: ProofContext[T]](implicit reporter: AccumulatingTagReporter) {
         case _: ast.ForAllAssumeStep => assert(assertion = false, "Unexpected situation.")
       }
     }
-    pcOpt.map(pc => pc.make(
+    pcOpt = pcOpt.map(pc => pc.make(
       premises = oldPremises,
       vars = pc.vars -- addedVars,
       provedSteps = pc.provedSteps -- addedSteps))
+    proofGroup match {
+      case p: ast.SubProof => pcOpt.flatMap(_.addProvedStep(p))
+      case _ => pcOpt
+    }
   }
 
   def check(step: ast.RegularStep): Option[T] = {
