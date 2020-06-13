@@ -323,8 +323,10 @@ private final class Z3(timeout: PosInteger, isSymExe: Boolean, isValidity: Boole
       case ast.RealLit(value) =>
         if (value.head == '-')
           stg.getInstanceOf("lit").add("value", s"(- ${value.tail})")
-        else
+        else if (value.contains('.'))
           stg.getInstanceOf("lit").add("value", value)
+        else
+          stg.getInstanceOf("lit").add("value", s"$value.0")
       case e: ast.IntMin =>
         translate(e.value, e.integralType)
       case e: ast.IntMax =>
