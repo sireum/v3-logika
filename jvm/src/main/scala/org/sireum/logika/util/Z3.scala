@@ -59,9 +59,13 @@ object Z3 {
       case OsArch.Win => "z3.exe"
       case _ => "z3"
     }
-    val z3Bin = new File(System.getenv("SIREUM_HOME"), s"/apps/z3/bin/$z3Filename")
+    var z3Bin = new File(System.getenv("SIREUM_HOME"), s"/apps/z3/bin/$z3Filename")
     if (z3Bin.canExecute) z3Bin.getAbsolutePath
-    else z3Filename
+    else {
+      z3Bin = new File(System.getProperty("org.sireum.home"), s"/apps/z3/bin/$z3Filename")
+      if (z3Bin.canExecute) z3Bin.getAbsolutePath
+      else z3Filename
+    }
   }
 
   def isValid(timeoutInMs: PosInteger, isSymExe: Boolean, bitWidth: Natural,
