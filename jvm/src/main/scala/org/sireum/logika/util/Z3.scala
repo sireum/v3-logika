@@ -125,7 +125,6 @@ private final class Z3(timeout: PosInteger, isSymExe: Boolean, isValidity: Boole
     st
   }
   val rounding = "RNE"
-  val hardTimeout: PosInteger = timeout + (timeout * 10) / 100
 
   def checkSat(es: ast.Exp*): (String, CheckResult) = try {
     val last = es.size - 1
@@ -151,14 +150,15 @@ private final class Z3(timeout: PosInteger, isSymExe: Boolean, isValidity: Boole
 
     try {
       val result = {
+        val t = timeout / 1000 + (if (timeout % 1000 == 0) 0 else 1)
         val input =
           OsUtil.detect match {
             case OsArch.Win =>
-              ivector(z3, "/smt2", s"/t:$timeout", "/in")
+              ivector(z3, "/smt2", s"/T:$t", "/in")
             case _ =>
-              ivector(z3, "-smt2", s"-t:$timeout", "-in")
+              ivector(z3, "-smt2", s"-T:$t", "-in")
           }
-        new Exec().run(hardTimeout, input, Some(z3Script), None)
+        new Exec().run(-1, input, Some(z3Script), None)
       }
 
       val r =
