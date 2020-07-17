@@ -59,9 +59,13 @@ object Z3 {
       case OsArch.Win => "z3.exe"
       case _ => "z3"
     }
-    val z3Bin = new File(System.getenv("SIREUM_HOME"), s"/apps/z3/bin/$z3Filename")
+    var z3Bin = new File(System.getenv("SIREUM_HOME"), s"/apps/z3/bin/$z3Filename")
     if (z3Bin.canExecute) z3Bin.getAbsolutePath
-    else z3Filename
+    else {
+      z3Bin = new File(System.getProperty("org.sireum.home"), s"/apps/z3/bin/$z3Filename")
+      if (z3Bin.canExecute) z3Bin.getAbsolutePath
+      else z3Filename
+    }
   }
 
   def isValid(timeoutInMs: PosInteger, isSymExe: Boolean, bitWidth: Natural,
@@ -121,7 +125,6 @@ private final class Z3(timeout: PosInteger, isSymExe: Boolean, isValidity: Boole
     st
   }
   val rounding = "RNE"
-  val hardTimeout: PosInteger = timeout + (timeout * 10) / 100
 
   def checkSat(es: ast.Exp*): (String, CheckResult) = try {
     val last = es.size - 1
@@ -147,14 +150,15 @@ private final class Z3(timeout: PosInteger, isSymExe: Boolean, isValidity: Boole
 
     try {
       val result = {
+        val t = timeout / 1000 + (if (timeout % 1000 == 0) 0 else 1)
         val input =
           OsUtil.detect match {
             case OsArch.Win =>
-              ivector(z3, "/smt2", s"/t:$timeout", "/in")
+              ivector(z3, "/smt2", s"/T:$t", "/in")
             case _ =>
-              ivector(z3, "-smt2", s"-t:$timeout", "-in")
+              ivector(z3, "-smt2", s"-T:$t", "-in")
           }
-        new Exec().run(hardTimeout, input, Some(z3Script), None)
+        new Exec().run(-1, input, Some(z3Script), None)
       }
 
       val r =
@@ -319,8 +323,10 @@ private final class Z3(timeout: PosInteger, isSymExe: Boolean, isValidity: Boole
       case ast.RealLit(value) =>
         if (value.head == '-')
           stg.getInstanceOf("lit").add("value", s"(- ${value.tail})")
-        else
+        else if (value.contains('.'))
           stg.getInstanceOf("lit").add("value", value)
+        else
+          stg.getInstanceOf("lit").add("value", s"$value.0")
       case e: ast.IntMin =>
         translate(e.value, e.integralType)
       case e: ast.IntMax =>
