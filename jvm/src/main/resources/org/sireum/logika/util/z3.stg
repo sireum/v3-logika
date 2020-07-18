@@ -265,6 +265,7 @@ $else$
 $endif$
 ; Axioms and Query
 $e$(check-sat)
+(exit)
 >>
 
 assertion(e) ::= <<
