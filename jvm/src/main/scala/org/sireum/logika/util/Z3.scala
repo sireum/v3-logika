@@ -55,17 +55,12 @@ object Z3 {
 
   val z3: String = synchronized {
     import java.io._
-    val z3Filename = OsUtil.detect match {
-      case OsArch.Win => "z3.exe"
-      case _ => "z3"
+    var z3Bin = new File("z3")
+    for (dir <- Seq(System.getenv("SIREUM_HOME"), System.getProperty("org.sireum.home"));
+         z3Filename <- Seq("z3", "z3.exe") if !z3Bin.canExecute) {
+      z3Bin = new File(dir, s"/apps/z3/bin/$z3Filename")
     }
-    var z3Bin = new File(System.getenv("SIREUM_HOME"), s"/apps/z3/bin/$z3Filename")
-    if (z3Bin.canExecute) z3Bin.getAbsolutePath
-    else {
-      z3Bin = new File(System.getProperty("org.sireum.home"), s"/apps/z3/bin/$z3Filename")
-      if (z3Bin.canExecute) z3Bin.getAbsolutePath
-      else z3Filename
-    }
+    z3Bin.getAbsolutePath
   }
 
   def isValid(timeoutInMs: PosInteger, isSymExe: Boolean, bitWidth: Natural,
