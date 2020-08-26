@@ -1,4 +1,4 @@
-// Generated from /Users/robby/Repositories/Sireum/sireum-v3/logika/jvm/src/main/resources/org/sireum/logika/parser/Antlr4Logika.g4 by ANTLR 4.7
+// Generated from /Users/robby/Repositories/Sireum/v3/logika/jvm/src/main/resources/org/sireum/logika/parser/Antlr4Logika.g4 by ANTLR 4.8
 package org.sireum.logika.parser;
 
 // @formatter:off
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class Antlr4LogikaParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.8", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -58,57 +58,67 @@ public class Antlr4LogikaParser extends Parser {
 		RULE_stmt = 25, RULE_methodDecl = 26, RULE_blockEnd = 27, RULE_returnStmt = 28, 
 		RULE_stringOrExp = 29, RULE_primExp = 30, RULE_exp = 31, RULE_loopInvariant = 32, 
 		RULE_modifies = 33, RULE_methodContract = 34, RULE_invariants = 35;
-	public static final String[] ruleNames = {
-		"file", "truthTable", "row", "bool", "status", "assignments", "sequent", 
-		"proof", "proofStep", "primFormula", "formula", "qformula", "type", "justification", 
-		"program", "impor", "facts", "factOrFun", "fact", "fun", "funDef", "funDefCond", 
-		"funDefSimple", "param", "stmts", "stmt", "methodDecl", "blockEnd", "returnStmt", 
-		"stringOrExp", "primExp", "exp", "loopInvariant", "modifies", "methodContract", 
-		"invariants"
-	};
+	private static String[] makeRuleNames() {
+		return new String[] {
+			"file", "truthTable", "row", "bool", "status", "assignments", "sequent", 
+			"proof", "proofStep", "primFormula", "formula", "qformula", "type", "justification", 
+			"program", "impor", "facts", "factOrFun", "fact", "fun", "funDef", "funDefCond", 
+			"funDefSimple", "param", "stmts", "stmt", "methodDecl", "blockEnd", "returnStmt", 
+			"stringOrExp", "primExp", "exp", "loopInvariant", "modifies", "methodContract", 
+			"invariants"
+		};
+	}
+	public static final String[] ruleNames = makeRuleNames();
 
-	private static final String[] _LITERAL_NAMES = {
-		null, "'*'", "'|'", "'T'", "'\u22A4'", "'F'", "'\u22A5'", "'-'", "':'", 
-		"'['", "']'", "','", "'|-'", "'\u22A2'", "'{'", "'}'", "'.'", "'assume'", 
-		"'true'", "'false'", "'_|_'", "'('", "')'", "'result'", "'B'", "'Z'", 
-		"'Z8'", "'Z16'", "'Z32'", "'Z64'", "'N'", "'N8'", "'N16'", "'N32'", "'N64'", 
-		"'S8'", "'S16'", "'S32'", "'S64'", "'U8'", "'U16'", "'U32'", "'U64'", 
-		"'R'", "'F32'", "'F64'", "'BS'", "'ZS'", "'Z8S'", "'Z16S'", "'Z32S'", 
-		"'Z64S'", "'NS'", "'N8S'", "'N16S'", "'N32S'", "'N64S'", "'S8S'", "'S16S'", 
-		"'S32S'", "'S64S'", "'U8S'", "'U16S'", "'U32S'", "'U64S'", "'RS'", "'F32S'", 
-		"'F64S'", "'not'", "'neg'", "'!'", "'~'", "'\u00AC'", "'/'", "'%'", "'+'", 
-		"'+:'", "':+'", "'<'", "'<='", "'\u2264'", "'>'", "'>='", "'\u2265'", 
-		"'>>'", "'>>>'", "'<<'", "'='", "'=='", "'!='", "'\u2260'", "'and'", "'&'", 
-		"'^'", "'\u2227'", "'xor'", "'^|'", "'or'", "'V'", "'\u2228'", "'implies'", 
-		"'->'", "'\u2192'", "'forall'", "'all'", "'A'", "'\u2200'", "'exists'", 
-		"'some'", "'E'", "'\u2203'", "'..'", "'premise'", "'andi'", "'ande1'", 
-		"'ande2'", "'ori1'", "'Vi1'", "'ori2'", "'Vi2'", "'ore'", "'Ve'", "'impliesi'", 
-		"'impliese'", "'noti'", "'negi'", "'note'", "'nege'", "'bottome'", "'falsee'", 
-		"'pbc'", "'subst1'", "'subst2'", "'algebra'", "'foralli'", "'alli'", "'Ai'", 
-		"'foralle'", "'alle'", "'Ae'", "'existsi'", "'somei'", "'Ei'", "'existse'", 
-		"'somee'", "'Ee'", "'invariant'", "'fact'", "'auto'", "'import'", "'_'", 
-		"'def'", "'if'", "'var'", "'val'", "'assert'", "'else'", "'while'", "'l\"\"\"'", 
-		"'\"\"\"'", "'print'", "'println'", "'@'", "'Unit'", "'return'", "'randomInt'", 
-		"'readInt'", "'modifies'", "'requires'", "'pre'", "'ensures'", "'post'"
-	};
-	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, "HLINE", "NUM", "ID", "REAL", "INT", "RESERVED", 
-		"NL", "LINE_COMMENT", "COMMENT", "TAB", "WS", "STRING", "FLOAT", "ERROR_CHAR"
-	};
+	private static String[] makeLiteralNames() {
+		return new String[] {
+			null, "'*'", "'|'", "'T'", "'\u22A4'", "'F'", "'\u22A5'", "'-'", "':'", 
+			"'['", "']'", "','", "'|-'", "'\u22A2'", "'{'", "'}'", "'.'", "'assume'", 
+			"'true'", "'false'", "'_|_'", "'('", "')'", "'result'", "'B'", "'Z'", 
+			"'Z8'", "'Z16'", "'Z32'", "'Z64'", "'N'", "'N8'", "'N16'", "'N32'", "'N64'", 
+			"'S8'", "'S16'", "'S32'", "'S64'", "'U8'", "'U16'", "'U32'", "'U64'", 
+			"'R'", "'F32'", "'F64'", "'BS'", "'ZS'", "'Z8S'", "'Z16S'", "'Z32S'", 
+			"'Z64S'", "'NS'", "'N8S'", "'N16S'", "'N32S'", "'N64S'", "'S8S'", "'S16S'", 
+			"'S32S'", "'S64S'", "'U8S'", "'U16S'", "'U32S'", "'U64S'", "'RS'", "'F32S'", 
+			"'F64S'", "'not'", "'neg'", "'!'", "'~'", "'\u00AC'", "'/'", "'%'", "'+'", 
+			"'+:'", "':+'", "'<'", "'<='", "'\u2264'", "'>'", "'>='", "'\u2265'", 
+			"'>>'", "'>>>'", "'<<'", "'='", "'=='", "'!='", "'\u2260'", "'and'", 
+			"'&'", "'^'", "'\u2227'", "'xor'", "'^|'", "'or'", "'V'", "'\u2228'", 
+			"'implies'", "'->'", "'\u2192'", "'forall'", "'all'", "'A'", "'\u2200'", 
+			"'exists'", "'some'", "'E'", "'\u2203'", "'..'", "'premise'", "'andi'", 
+			"'ande1'", "'ande2'", "'ori1'", "'Vi1'", "'ori2'", "'Vi2'", "'ore'", 
+			"'Ve'", "'impliesi'", "'impliese'", "'noti'", "'negi'", "'note'", "'nege'", 
+			"'bottome'", "'falsee'", "'pbc'", "'subst1'", "'subst2'", "'algebra'", 
+			"'foralli'", "'alli'", "'Ai'", "'foralle'", "'alle'", "'Ae'", "'existsi'", 
+			"'somei'", "'Ei'", "'existse'", "'somee'", "'Ee'", "'invariant'", "'fact'", 
+			"'auto'", "'import'", "'_'", "'def'", "'if'", "'var'", "'val'", "'assert'", 
+			"'else'", "'while'", "'l\"\"\"'", "'\"\"\"'", "'print'", "'println'", 
+			"'@'", "'Unit'", "'return'", "'randomInt'", "'readInt'", "'modifies'", 
+			"'requires'", "'pre'", "'ensures'", "'post'"
+		};
+	}
+	private static final String[] _LITERAL_NAMES = makeLiteralNames();
+	private static String[] makeSymbolicNames() {
+		return new String[] {
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, "HLINE", "NUM", "ID", "REAL", "INT", "RESERVED", 
+			"NL", "LINE_COMMENT", "COMMENT", "TAB", "WS", "STRING", "FLOAT", "ERROR_CHAR"
+		};
+	}
+	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 	/**
@@ -158,6 +168,7 @@ public class Antlr4LogikaParser extends Parser {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
+
 	public static class FileContext extends ParserRuleContext {
 		public FileContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
