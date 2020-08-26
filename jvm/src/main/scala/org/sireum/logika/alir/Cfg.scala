@@ -25,8 +25,9 @@
 
 package org.sireum.logika.alir
 
-import org.jgrapht.io.DOTExporter
+import org.jgrapht.nio.dot.DOTExporter
 import org.jgrapht.graph.DefaultDirectedGraph
+import org.jgrapht.nio.{Attribute, DefaultAttribute}
 import org.sireum.logika.ast._
 import org.sireum.util._
 
@@ -145,10 +146,11 @@ private final class CfgImpl(mdOpt: Option[MethodDecl]) extends Cfg {
   def preds(n: Cfg.Node): ISet[Cfg.Node] = closure(n, pred)
 
   override def toDotString(unitNode: UnitNode): String = {
-    val dotExporter = new DOTExporter[Cfg.Node, Cfg.Edge](
-      v => nodeName(isID = true, unitNode, v),
-      v => nodeName(isID = false, unitNode, v),
-      e => e.label)
+    import scala.collection.JavaConverters._
+    val dotExporter = new DOTExporter[Cfg.Node, Cfg.Edge]()
+    dotExporter.setVertexIdProvider(v => nodeName(isID = true, unitNode, v))
+    dotExporter.setVertexAttributeProvider(v => (imapEmpty[String, Attribute] + ("label" -> DefaultAttribute.createAttribute(nodeName(isID = false, unitNode, v)))).asJava)
+    dotExporter.setEdgeAttributeProvider(e => (imapEmpty[String, Attribute] + ("label" -> DefaultAttribute.createAttribute(e.label))).asJava)
     val sw = new java.io.StringWriter
     dotExporter.exportGraph(graph, sw)
     sw.toString
