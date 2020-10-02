@@ -182,7 +182,7 @@ object SymbolConverter {
     tks(i).getText match {
       case "premise" | "assume" | "andi" | "ande1" | "ande2" |
            "ori1" | "Vi1" | "ori2" | "Vi2" | "ore" | "Ve" |
-           "impliese" | "impliese" | "noti" | "negi" | "note" | "nege" |
+           "impliese" | "noti" | "negi" | "note" | "nege" |
            "bottome" | "falsee" | "pbc" | "subst1" | "subst2" | "algebra" |
            "foralli" | "alli" | "Ai" | "foralle" | "alle" | "Ae" |
            "existsi" | "somei" | "Ei" | "existse" | "somee" | "Ee" |
@@ -213,7 +213,7 @@ object SymbolConverter {
   }
 
   private def tokens(input: String): CSeq[Token] = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     val inputStream = CharStreams.fromString(input)
     val lexer = new Antlr4LogikaLexer(inputStream)
     lexer.getAllTokens.asScala

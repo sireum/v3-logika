@@ -44,7 +44,7 @@ final class SymExeProgramTestDefProvider(tf: TestFramework)
   override def testDefs: ISeq[TestDef] =
     ((1 to 1).toVector.map { x =>
       val name = f"symexe/assignment-$x%02d"
-      ConditionTest('s' + name, check(name, 0, isSummarizing = true))
+      ConditionTest('s'.toString + name, check(name, 0, isSummarizing = true))
     } :+
       ConditionTest("symexe/square", check("symexe/square", 0, isSummarizing = true, timeout = 5000 * tmMult)) :+
       ConditionTest("symexe/max", check("symexe/max", 0, isSummarizing = true)) :+

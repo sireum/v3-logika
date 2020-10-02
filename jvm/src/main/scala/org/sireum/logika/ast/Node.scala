@@ -180,7 +180,7 @@ object Node {
             }
           case _ =>
             val a = Apply(n, Node.emptySeq)
-            nodeLocMap(a) = nodeLocMap(n)
+            nodeLocMap.put(a, nodeLocMap(n))
             applyMap += (id -> a)
         }
         false
@@ -428,13 +428,18 @@ final case class LogicMode private(value: String) {
   override def toString: String = value
 }
 
-sealed trait Node extends Product
+sealed trait Node extends Product {
+//  override def hashCode(): Int = System.identityHashCode(this)
+//
+//  override def equals(obj: Any): Boolean = this.hashCode() == obj.hashCode()
+}
 
 sealed trait UnitNode extends Node {
   var fileUriOpt: Option[FileResourceUri] = None
   var nodeLocMap: MIdMap[Node, LocationInfo] = midmapEmpty
   var mode = LogicMode.Programming
   var input: String = ""
+
 }
 
 final case class TruthTable(star: TruthTableMarker,
@@ -445,7 +450,9 @@ final case class TruthTable(star: TruthTableMarker,
                             statusOpt: Option[TruthTableStatus])
   extends UnitNode
 
-final case class TruthTableMarker() extends Node
+final case class TruthTableMarker() extends Node {
+
+}
 
 final case class TruthTableRow(assignments: Assignments,
                                bar: TruthTableMarker,
@@ -947,7 +954,7 @@ final case class IntLit(value: String,
               throw new IllegalStateException(s"Literal $value is outside of N16's value range.")
             n
           case _: N32Type =>
-            if (!(BigInt(0) <= n && n <= BigInt(4294967295l)))
+            if (!(BigInt(0) <= n && n <= BigInt(4294967295L)))
               throw new IllegalStateException(s"Literal $value is outside of N32's value range.")
             n
           case _: N64Type =>

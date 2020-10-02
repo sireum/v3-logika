@@ -53,7 +53,7 @@ object AstUtil {
         if (!contentChars(i).isWhitespace)
           contentChars(i) = ' '
 
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     import org.sireum.logika.parser.Antlr4LogikaLexer
     import Antlr4LogikaLexer._
     val inputStream = CharStreams.fromString(content)

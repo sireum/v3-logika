@@ -25,9 +25,9 @@
 
 package org.sireum.logika.alir
 
-import org.jgrapht.nio.dot.DOTExporter
 import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.nio.{Attribute, DefaultAttribute}
+import org.jgrapht.nio.dot.DOTExporter
 import org.sireum.logika.ast._
 import org.sireum.util._
 
@@ -50,19 +50,19 @@ object Cfg {
   final case class VirtualNode private(mdOpt: Option[MethodDecl], label: String) extends Node
 
   final case class StmtNode private(stmt: Stmt) extends Node {
-    override def hashCode: Int = System.identityHashCode(stmt)
-
-    override def equals(other: Any): Boolean = hashCode == other.hashCode
+//    override def hashCode: Int = System.identityHashCode(stmt)
+//
+//    override def equals(other: Any): Boolean = hashCode == other.hashCode
   }
 
   final case class ReturnNode private(ret: Return) extends Node {
-    override def hashCode: Int = System.identityHashCode(ret)
-
-    override def equals(other: Any): Boolean = hashCode == other.hashCode
+//    override def hashCode: Int = System.identityHashCode(ret)
+//
+//    override def equals(other: Any): Boolean = hashCode == other.hashCode
   }
 
   final class Edge(val label: String) {
-    def this() {
+    def this() = {
       this("")
     }
 
@@ -126,14 +126,14 @@ private final class CfgImpl(mdOpt: Option[MethodDecl]) extends Cfg {
   }
 
   def succ(n: Cfg.Node): ISet[Cfg.Node] = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     var r = isetEmpty[Cfg.Node]
     r ++= graph.outgoingEdgesOf(n).asScala.map(graph.getEdgeTarget)
     r
   }
 
   def pred(n: Cfg.Node): ISet[Cfg.Node] = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     var r = isetEmpty[Cfg.Node]
     r ++= graph.incomingEdgesOf(n).asScala.map(graph.getEdgeSource)
     r
@@ -146,7 +146,7 @@ private final class CfgImpl(mdOpt: Option[MethodDecl]) extends Cfg {
   def preds(n: Cfg.Node): ISet[Cfg.Node] = closure(n, pred)
 
   override def toDotString(unitNode: UnitNode): String = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     val dotExporter = new DOTExporter[Cfg.Node, Cfg.Edge]()
     dotExporter.setVertexIdProvider(v => nodeName(isID = true, unitNode, v))
     dotExporter.setVertexAttributeProvider(v => (imapEmpty[String, Attribute] + ("label" -> DefaultAttribute.createAttribute(nodeName(isID = false, unitNode, v)))).asJava)
@@ -183,7 +183,7 @@ private final class CfgImpl(mdOpt: Option[MethodDecl]) extends Cfg {
     removeIfEndNodes()
     frozen = true
     nodes += startNode
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     for (node <- graph.vertexSet.asScala) {
       nodes += node
     }
@@ -192,8 +192,8 @@ private final class CfgImpl(mdOpt: Option[MethodDecl]) extends Cfg {
   }
 
   private def removeIfEndNodes() = {
-    import scala.collection.JavaConverters._
-    for (stmt@If(_, _, _) <- nodeMap.keys) {
+    import scala.jdk.CollectionConverters._
+    for (stmt@If(_, _, _) <- nodeMap.toMap().keys) {
       val ifEnd = ifEndNode(stmt)
       for (predEdge <- graph.incomingEdgesOf(ifEnd).asScala;
            succEdge <- graph.outgoingEdgesOf(ifEnd).asScala) {
@@ -213,12 +213,12 @@ private final class CfgImpl(mdOpt: Option[MethodDecl]) extends Cfg {
         case _ => "program"
       }
       val r = s"$unitName.${n.label}"
-      if (isID) '"' + r + '"' else r
+      if (isID) '"'.toString + r + '"'.toString else r
     case n: Cfg.ReturnNode =>
       n.ret.expOpt match {
         case Some(e) =>
           val r = s"return ${Exp.toString(e, inProof = false)}"
-          if (isID) '"' + r + '"' else r
+          if (isID) '"'.toString + r + '"'.toString else r
         case _ => "return"
       }
   }

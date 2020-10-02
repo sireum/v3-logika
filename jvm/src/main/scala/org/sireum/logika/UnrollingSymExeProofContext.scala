@@ -67,7 +67,7 @@ UnrollingSymExeProofContext(unitNode: ast.Program,
                             declaredStepNumbers: IMap[Natural, LocationInfo] = imapEmpty,
                             mdOpt: Option[ast.MethodDecl] = None,
                             satFacts: Boolean = true,
-                            stmtBound: CMap[ast.Stmt, Int] = midmapEmpty,
+                            stmtBound: MIdMap[ast.Stmt, Int] = midmapEmpty,
                             loopBound: Natural = 10,
                             recursionBound: Natural = 10,
                             useMethodContract: Boolean = true,
@@ -124,21 +124,21 @@ UnrollingSymExeProofContext(unitNode: ast.Program,
 
   def bound(stmt: ast.Stmt, isLoop: Boolean): Option[UnrollingSymExeProofContext] = {
     val m = stmtBound.asInstanceOf[MIdMap[ast.Stmt, Natural]].clone()
-    stmtBound.get(stmt) match {
+    stmtBound.toMap().get(stmt) match {
       case Some(n) =>
         if (isLoop) {
           if (n <= loopBound) {
-            m(stmt) = n + 1
+            m.put(stmt, n + 1)
             Some(copy(stmtBound = m))
           } else None
         } else {
           if (n <= recursionBound) {
-            m(stmt) = n + 1
+            m.put(stmt, n + 1)
             Some(copy(stmtBound = m))
           } else None
         }
       case _ =>
-        m(stmt) = 1
+        m.put(stmt, 1)
         Some(copy(stmtBound = m))
     }
   }
@@ -195,7 +195,7 @@ UnrollingSymExeProofContext(unitNode: ast.Program,
 
   def check(block: ast.Block, checkReturn: Boolean = false): ISeq[UnrollingSymExeProofContext] = {
     var r = ivectorEmpty[UnrollingSymExeProofContext]
-    var pcs: GenSeq[UnrollingSymExeProofContext] = ivector(this).par
+    var pcs: GenSeq[UnrollingSymExeProofContext] = ivector(this)
     for (stmt <- block.stmts) {
       val vc = varCounter.value
       val (next, done) = (for (pc <- pcs) yield {

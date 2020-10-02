@@ -60,7 +60,7 @@ object Checker {
         var hasError = false
         for (program <- programs) {
           def symExeOnly(n: ast.Exp): Unit =
-            error(program.fileUriOpt, program.nodeLocMap(n), s"${ast.Exp.toString(n, inProof = false)} can only be used in symbolic execution.")
+            error(program.fileUriOpt, program.nodeLocMap.get(n), s"${ast.Exp.toString(n, inProof = false)} can only be used in symbolic execution.")
 
           try Visitor.build({
             case n: ast.TypeMethodCallExp if !isSymExe => symExeOnly(n); throw new RuntimeException
@@ -71,7 +71,7 @@ object Checker {
                 t.buildString(sb)
                 sb.toString
               }
-              error(program.fileUriOpt, program.nodeLocMap(t), s"Type $ts can only be used in symbolic execution.")
+              error(program.fileUriOpt, program.nodeLocMap.get(t), s"Type $ts can only be used in symbolic execution.")
               throw new RuntimeException
             case t: ast.SeqType if !t.isInstanceOf[ast.ZSType] && !isSymExe =>
               val ts = {
@@ -79,7 +79,7 @@ object Checker {
                 t.buildString(sb)
                 sb.toString
               }
-              error(program.fileUriOpt, program.nodeLocMap(t), s"Type $ts can only be used in symbolic execution.")
+              error(program.fileUriOpt, program.nodeLocMap.get(t), s"Type $ts can only be used in symbolic execution.")
               throw new RuntimeException
           })(program) catch {
             case _: RuntimeException => hasError = true
@@ -178,7 +178,7 @@ object Checker {
           for (c <- s.conclusions)
             if (!exps.contains(c)) {
               r = false
-              error(fileUriOpt, nodeLocMap(c), s"The sequent conclusion has not been proved.")
+              error(fileUriOpt, nodeLocMap.get(c), s"The sequent conclusion has not been proved.")
             }
           if (r) reporter.report(InfoMessage(kind, s"${unitNode.mode.value} logic proof is accepted."))
           else reporter.report(ErrorMessage(kind, s"${unitNode.mode.value} logic proof is rejected."))
@@ -457,14 +457,14 @@ ProofContext[T <: ProofContext[T]](implicit reporter: AccumulatingTagReporter) {
     lazy val v: Any => Boolean = Visitor.build({
       case a: ast.Apply =>
         a.declOpt match {
-          case Some(Left(md)) if !seen.contains(md) =>
-            seen(md) = true
+          case Some(Left(md)) if !seen.toMap().contains(md) =>
+            seen.put(md, true)
             for (e <- extractFact(md)) {
               r += e
               v(e)
             }
-          case Some(Right(fun)) if !seen.contains(fun) =>
-            seen(fun) = true
+          case Some(Right(fun)) if !seen.toMap().contains(fun) =>
+            seen.put(fun, true)
             for (fd <- fun.funDefs) {
               val e = extractFact(fun, fd)
               r += e
@@ -615,7 +615,7 @@ ProofContext[T <: ProofContext[T]](implicit reporter: AccumulatingTagReporter) {
       val m = midmapEmpty[ast.Exp, (Set[String], Natural)]
       var i = 0
       for (e <- premises) {
-        m(e) = (collectIds(e), i)
+        m.put(e, (collectIds(e), i))
         i += 1
       }
       var changed = true

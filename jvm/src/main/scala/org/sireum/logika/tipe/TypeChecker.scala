@@ -26,7 +26,8 @@
 package org.sireum.logika.tipe
 
 import org.sireum.logika.ast._
-import org.sireum.util._
+import org.sireum.util.{AccumulatingTagReporter, IMap, ISet, Left3, MMap, Middle3, Natural,
+  Right3, Visitor, imapEmpty, isetEmpty, ivectorEmpty, mmapEmpty, ivector}
 
 object TypeChecker {
   final val kind: String = "Type Checker"
@@ -449,10 +450,10 @@ TypeContext(typeMap: IMap[String, (Tipe, Node, Program)],
         mseq(e.id)
       case e: Result =>
         val id = Id("result")
-        program.nodeLocMap(id) = program.nodeLocMap(e)
+        program.nodeLocMap.put(id, program.nodeLocMap(e))
         val r = tipe(id)
         r.foreach(e.tipe = _)
-        program.nodeLocMap -= id
+        program.nodeLocMap.remove(id)
         r
       case e: Apply =>
         val isMethod =

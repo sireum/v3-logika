@@ -74,9 +74,9 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
   private def build(ctx: RowContext): TruthTableRow = {
     val model = ctx.model.toVector.map(build)
     TruthTableRow(
-      Assignments(model at(model.head, model.last)),
-      TruthTableMarker() at ctx.bar,
-      ctx.eval.map(build)) at ctx
+      Assignments(model.at(model.head, model.last)),
+      TruthTableMarker().at( ctx.bar),
+      ctx.eval.map(build)).at( ctx)
   }
 
   private def build(ctx: BoolContext): BooleanLit =
@@ -135,7 +135,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
 
   private def build(ctx: ProofContext): Proof =
     Proof(Option(ctx.proofStep).map(_.map(build)).
-      getOrElse(Node.emptySeq)) at(ctx.tb, ctx.te)
+      getOrElse(Node.emptySeq)).at(ctx.tb, ctx.te)
 
   private def build(ctx: ProofStepContext): ProofStep = ctx match {
     case ctx: StepContext => build(ctx)
@@ -289,10 +289,10 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
         if (ctx.ID != null)
           ExistsAssumeStep(assume, buildId(ctx.ID),
             Option(ctx.`type`).map(build),
-            build(ctx.formula)) at(ctx.assume, ctx.ate)
+            build(ctx.formula)).at(ctx.assume, ctx.ate)
         else
           PlainAssumeStep(assume,
-            build(ctx.formula)) at(ctx.assume, ctx.ate)
+            build(ctx.formula)).at(ctx.assume, ctx.ate)
       else
         ForAllAssumeStep(assume,
           buildId(ctx.ID), Option(ctx.`type`).map(build)) at ctx.ID
@@ -473,7 +473,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
         SeqLit(token2type(ctx.t).asInstanceOf[SeqType],
           Option(ctx.exp).map(_.map(build)).getOrElse(Node.emptySeq))
     }
-    if (!(nodeLocMap isDefinedAt r)) r at ctx
+    if (!(nodeLocMap containsKey r)) r at ctx
     else r
   }
 
@@ -502,37 +502,37 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
         val r = ctx.op.getText match {
           case "*" =>
             val r = Mul(lExp, rExp)
-            for (lN <- constMap.get(lExp);
-                 rN <- constMap.get(rExp)) {
+            for (lN <- constMap.toMap().get(lExp);
+                 rN <- constMap.toMap().get(rExp)) {
               checkIntMaxMin(ctx.op, lN * rN, r)
             }
             r
           case "/" =>
             val r = Div(lExp, rExp)
-            for (lN <- constMap.get(lExp);
-                 rN <- constMap.get(rExp)) {
+            for (lN <- constMap.toMap().get(lExp);
+                 rN <- constMap.toMap().get(rExp)) {
               if (rN == zero) error(rExp, s"Division by zero detected.")
               else checkIntMaxMin(ctx.op, lN / rN, r)
             }
             r
           case "%" =>
             val r = Rem(lExp, rExp)
-            for (lN <- constMap.get(lExp);
-                 rN <- constMap.get(rExp)) {
+            for (lN <- constMap.toMap().get(lExp);
+                 rN <- constMap.toMap().get(rExp)) {
               if (rN == zero) error(rExp, s"Division by zero detected.")
               else checkIntMaxMin(ctx.op, lN % rN, r)
             }
             r
           case "+" =>
             val r = Add(lExp, rExp)
-            for (lN <- constMap.get(lExp);
-                 rN <- constMap.get(rExp))
+            for (lN <- constMap.toMap().get(lExp);
+                 rN <- constMap.toMap().get(rExp))
               checkIntMaxMin(ctx.op, lN + rN, r)
             r
           case "-" =>
             val r = Sub(lExp, rExp)
-            for (lN <- constMap.get(lExp);
-                 rN <- constMap.get(rExp))
+            for (lN <- constMap.toMap().get(lExp);
+                 rN <- constMap.toMap().get(rExp))
               checkIntMaxMin(ctx.op, lN - rN, r)
             r
           case ":+" => Append(lExp, rExp)
@@ -547,7 +547,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
           case "=" => Eq(lExp, rExp)
           case "==" =>
             val r = Eq(lExp, rExp)
-            if (constMap.isDefinedAt(lExp) && !constMap.isDefinedAt(rExp)) {
+            if (constMap.toMap().isDefinedAt(lExp) && !constMap.toMap().isDefinedAt(rExp)) {
               val lLi = nodeLocMap(lExp)
               val rLi = nodeLocMap(rExp)
               val lExpS = input.substring(lLi.offset, lLi.offset + lLi.length)
@@ -559,7 +559,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
           case "≠" => Ne(lExp, rExp)
           case "!=" =>
             val r = Ne(lExp, rExp)
-            if (constMap.isDefinedAt(lExp) && !constMap.isDefinedAt(rExp)) {
+            if (constMap.toMap().isDefinedAt(lExp) && !constMap.toMap().isDefinedAt(rExp)) {
               val lLi = nodeLocMap(lExp)
               val rLi = nodeLocMap(rExp)
               val lExpS = input.substring(lLi.offset, lLi.offset + lLi.length)
@@ -579,7 +579,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
         val r = ctx.op.getText match {
           case "-" =>
             val r = Minus(exp)
-            constMap.get(exp) match {
+            constMap.toMap().get(exp) match {
               case Some(n) => checkIntMaxMin(ctx.op, -n, r)
               case _ =>
             }
@@ -605,7 +605,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
         val hi = build(ctx.hi)
         Some(
           RangeDomain(lo, hi, ctx.ll != null,
-            ctx.lh != null) at(lo, hi))
+            ctx.lh != null).at(lo, hi))
       } else None
     apply(ctx.vars.map(buildId), domain,
       build(ctx.qf)) at ctx
@@ -630,7 +630,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
       error(ctx.org, s"Can only import from org.sireum.logika.")
 
   private def build(ctx: FactsContext): Facts =
-    Facts(ctx.factOrFun.map(build)) at(ctx.ftb, ctx.te)
+    Facts(ctx.factOrFun.map(build)).at(ctx.ftb, ctx.te)
 
   private def build(ctx: FactOrFunContext): FactOrFun =
     if (ctx.fact != null) build(ctx.fact) else build(ctx.fun)
@@ -669,7 +669,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
     val r = Block(Option(ctx.stmts.stmt) match {
       case Some(stmts) => for (stmt <- stmts; s <- build(stmt)) yield s
       case None => Node.emptySeq
-    }, Option(ctx.returnStmt).map(build)) at(t, ctx.t)
+    }, Option(ctx.returnStmt).map(build)).at(t, ctx.t)
     if (r.returnOpt.isDefined && !inMethod) {
       error(r.returnOpt.get, s"Returning a value is only possible inside a method.")
     }
@@ -743,7 +743,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
   }
 
   private def build(ctx: MethodDeclContext): MethodDecl = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     if (ctx.id.getText.indexOf('_') >= 0)
       error(ctx.id, s"Underscore is a reserved character for method identifier.")
     var anns = imapEmpty[String, Token]
@@ -965,7 +965,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
         val r = ctx.op.getText match {
           case "-" =>
             val r = Minus(exp)
-            constMap.get(exp) match {
+            constMap.toMap().get(exp) match {
               case Some(n) => checkIntMaxMin(ctx.op, -n, r)
               case _ =>
             }
@@ -979,36 +979,36 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
         val r = ctx.op.getText match {
           case "*" =>
             val r = Mul(lExp, rExp)
-            for (lN <- constMap.get(lExp);
-                 rN <- constMap.get(rExp))
+            for (lN <- constMap.toMap().get(lExp);
+                 rN <- constMap.toMap().get(rExp))
               checkIntMaxMin(ctx.op, lN * rN, r)
             r
           case "/" =>
             val r = Div(lExp, rExp)
-            for (lN <- constMap.get(lExp);
-                 rN <- constMap.get(rExp)) {
+            for (lN <- constMap.toMap().get(lExp);
+                 rN <- constMap.toMap().get(rExp)) {
               if (rN == zero) error(rExp, s"Divide by zero detected.")
               else checkIntMaxMin(ctx.op, lN / rN, r)
             }
             r
           case "%" =>
             val r = Rem(lExp, rExp)
-            for (lN <- constMap.get(lExp);
-                 rN <- constMap.get(rExp)) {
+            for (lN <- constMap.toMap().get(lExp);
+                 rN <- constMap.toMap().get(rExp)) {
               if (rN == zero) error(rExp, s"Modulo by zero detected.")
               else checkIntMaxMin(ctx.op, lN % rN, r)
             }
             r
           case "+" =>
             val r = Add(lExp, rExp)
-            for (lN <- constMap.get(lExp);
-                 rN <- constMap.get(rExp))
+            for (lN <- constMap.toMap().get(lExp);
+                 rN <- constMap.toMap().get(rExp))
               checkIntMaxMin(ctx.op, lN + rN, r)
             r
           case "-" =>
             val r = Sub(lExp, rExp)
-            for (lN <- constMap.get(lExp);
-                 rN <- constMap.get(rExp))
+            for (lN <- constMap.toMap().get(lExp);
+                 rN <- constMap.toMap().get(rExp))
               checkIntMaxMin(ctx.op, lN - rN, r)
             r
           case ":+" => Append(lExp, rExp)
@@ -1022,7 +1022,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
           case "<<" => Shl(lExp, rExp)
           case "==" =>
             val r = Eq(lExp, rExp)
-            if (constMap.isDefinedAt(lExp) && !constMap.isDefinedAt(rExp)) {
+            if (constMap.containsKey(lExp) && !constMap.containsKey(rExp)) {
               val lLi = nodeLocMap(lExp)
               val rLi = nodeLocMap(rExp)
               val lExpS = input.substring(lLi.offset, lLi.offset + lLi.length)
@@ -1033,7 +1033,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
             r
           case "!=" =>
             val r = Ne(lExp, rExp)
-            if (constMap.isDefinedAt(lExp) && !constMap.isDefinedAt(rExp)) {
+            if (constMap.containsKey(lExp) && !constMap.containsKey(rExp)) {
               val lLi = nodeLocMap(lExp)
               val rLi = nodeLocMap(rExp)
               val lExpS = input.substring(lLi.offset, lLi.offset + lLi.length)
@@ -1056,25 +1056,24 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
 
     LoopInv(
       if (inv.exps.isEmpty) inv
-      else inv at(ctx.itb, inv.exps.last),
+      else inv.at(ctx.itb, inv.exps.last),
       Option(ctx.modifies).map(build).
-        getOrElse(Modifies(Node.emptySeq))) at(ctx.tb, ctx.te)
+        getOrElse(Modifies(Node.emptySeq))).at(ctx.tb, ctx.te)
   }
 
   private def build(ctx: ModifiesContext): Modifies = {
     val ids = ctx.ID.map(buildId)
-    Modifies(ids) at(ctx.tb, ids.last)
+    Modifies(ids).at(ctx.tb, ids.last)
   }
 
   private def build(ctx: MethodContractContext): MethodContract =
     MethodContract(
       Requires(Option(ctx.rs).map(_.map(build)).getOrElse(Node.emptySeq)),
       Option(ctx.modifies).map(build).getOrElse(Modifies(Node.emptySeq)),
-      Ensures(Option(ctx.es).map(_.map(build)).getOrElse(Node.emptySeq))) at
-      (ctx.tb, ctx.te)
+      Ensures(Option(ctx.es).map(_.map(build)).getOrElse(Node.emptySeq))).at(ctx.tb, ctx.te)
 
   private def build(ctx: InvariantsContext): Inv =
-    Inv(ctx.formula.map(build)) at(ctx.tb, ctx.te)
+    Inv(ctx.formula.map(build)).at(ctx.tb, ctx.te)
 
   private def buildId(tn: TerminalNode): Id = buildId(tn.getSymbol)
 
@@ -1099,7 +1098,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
       error(t, s"""32-bit integer underflow is detected, please use z"..." to construct an arbitrary-precision integer.""")
     else if (value > maxInt)
       error(t, s"""32-bit integer overflow is detected, please use z"..." to construct an arbitrary-precision integer.""")
-    else constMap(e) = value
+    else constMap.put(e, value)
   }
 
   private def errorIf(num: Num, id: Token, op: Token,
@@ -1128,7 +1127,7 @@ final private class Builder(fileUriOpt: Option[FileResourceUri], input: String, 
 
   @inline
   private implicit def toNodeSeq[T](ns: java.lang.Iterable[T]): Node.Seq[T] =
-    Node.seq[T](scala.collection.JavaConverters.iterableAsScalaIterable(ns))
+    Node.seq[T](scala.jdk.CollectionConverters.IterableHasAsScala(ns).asScala)
 
   @inline
   private implicit def toToken(n: TerminalNode): Token =
@@ -1160,7 +1159,7 @@ object Builder {
     val tokenStream = new CommonTokenStream(lexer)
     tokenStream.fill()
     val mode = {
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       var firstTokenOpt: Option[Token] = None
       for (t <- tokenStream.getTokens().asScala if firstTokenOpt.isEmpty) {
         if (t.getType != Antlr4LogikaLexer.NL &&
@@ -1178,7 +1177,7 @@ object Builder {
       }
     }
     {
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       var inProofContext = false
       lexer.reset()
       val tokens = lexer.getAllTokens
@@ -1254,7 +1253,7 @@ object Builder {
                              isProgram: Boolean): Unit = {
     import Antlr4LogikaLexer.{ID, NL, NUM}
     val tokens: CSeq[Token] = {
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       cts.getTokens.asScala
     }
     if (tokens.isEmpty) {
