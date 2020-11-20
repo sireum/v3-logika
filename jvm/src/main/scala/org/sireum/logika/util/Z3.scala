@@ -56,8 +56,11 @@ object Z3 {
   val z3: String = synchronized {
     import java.io._
     var z3Bin = new File("z3")
-    for (dir <- Seq(System.getenv("SIREUM_HOME"), System.getProperty("org.sireum.home"));
-         z3Filename <- Seq("z3", "z3.exe") if !z3Bin.canExecute) {
+    val z3Filename = OsUtil.detect match {
+      case OsArch.Win => "z3.exe"
+      case _ => "z3"
+    }
+    for (dir <- Seq(System.getenv("SIREUM_HOME"), System.getProperty("org.sireum.home")) if !z3Bin.canExecute) {
       z3Bin = new File(dir, s"/apps/z3/bin/$z3Filename")
     }
     z3Bin.getAbsolutePath
