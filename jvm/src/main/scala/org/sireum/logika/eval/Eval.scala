@@ -700,6 +700,7 @@ private final class Eval(store: Store) {
           case _: F32SType => Value(tipe.F32S, F32S(args.map(_.asInstanceOf[F32]): _*))
           case _: F64SType => Value(tipe.F64S, F64S(args.map(_.asInstanceOf[F64]): _*))
         })
+      case e => throw new RuntimeException(s"Infeasible: $e")
     }
     r
   }
